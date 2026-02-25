@@ -157,18 +157,6 @@ This notebook:
 
 ---
 
-Nice result—that histogram + effect size tells a really clean story 👌
-Here’s a **ready-to-paste README section** that:
-
-* Shows your key metrics (control/treatment/lift)
-* Interprets the result clearly
-* Embeds the histogram image from `images/permutation_results_histogram.png`
-* Renders correctly on GitHub (no LaTeX issues)
-
-Put this under a section like **“📈 Results: A/B Test (Permutation Test)”** in your `README.md`.
-
----
-
 ## 📈 Results: A/B Test (Permutation Test)
 
 ### Key Metrics
