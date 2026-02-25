@@ -5,9 +5,9 @@
 </p>
 
 **End-to-end experimentation + predictive modeling on simulated CDC-style public health outreach data.**
-This project demonstrates how to design and analyze randomized A/B tests using **permutation testing** and how to extend experimental insights with **predictive analytics (XGBoost)** to identify which populations are most likely to engage with public health interventions.
+This project demonstrates how causal experimentation (A/B testing) and predictive modeling (XGBoost + SHAP + uplift targeting) can be combined to design and operationalize data-driven public health outreach strategies.
 
-> **Core focus:** Experimental design, causal thinking, and ML-driven decision support in a public health / healthcare context.
+> **Core focus:** Experimental design, causal thinking, predictive analytics, and ML-driven decision support in a public health / healthcare context.
 
 ---
 
@@ -16,15 +16,15 @@ This project demonstrates how to design and analyze randomized A/B tests using *
 * **Task:** A/B testing + predictive analytics
 * **Domain:** Public health outreach (CDC-style messaging campaigns)
 * **Experiment:** Permutation-based A/B testing
-* **ML (planned):** XGBoost classification for engagement prediction
+* **ML:** XGBoost classification for pre-send scheduling prediction
 * **Tech Stack:** Python, Pandas, NumPy, Plotly, Scikit-learn, XGBoost
-* **Outputs:** Statistical testing, uplift visualization, reproducible notebooks
+* **Outputs:** Statistical testing, uplift visualization, reproducible notebooks, SHAP interpretability
 
 ---
 
 ## 🧠 Motivation & Problem Statement
 
-Public health agencies often deploy large-scale outreach campaigns (SMS, email, IVR) to encourage preventive care such as vaccination scheduling. However, choosing which message strategy to deploy at scale is non-trivial.
+Public health agencies often deploy large-scale outreach campaigns (SMS, email, IVR) to encourage preventive care such as vaccination scheduling. However, choosing which message strategy to deploy at scale—and to whom—is non-trivial.
 
 **Key questions:**
 
@@ -36,31 +36,7 @@ Public health agencies often deploy large-scale outreach campaigns (SMS, email, 
 This project simulates a randomized CDC-style outreach experiment and applies:
 
 * **Permutation testing** to quantify causal impact
-* **Predictive modeling (XGBoost)** to forecast scheduling behavior
-
----
-
-## 📊 Dataset Description
-
-The dataset is **synthetically generated** to resemble a realistic CDC outreach scenario and includes:
-
-* Demographics: `age`, `sex`, `region`
-* Risk & barriers: `risk_score`, `barriers_index`
-* Engagement history: `prior_cdc_interactions_90d`, `prior_appointments_1y`, `missed_appointments_1y`
-* Experiment design: `message_variant` (A vs B)
-* Engagement signals: `opened`, `clicked`
-* Outcomes:
-
-  * `scheduled_7d` (primary A/B test outcome)
-  * `completed_30d` (secondary downstream outcome)
-
-> **Important:** The treatment assignment (`message_variant`) is randomized, enabling valid causal inference via permutation testing.
-
-Dataset location:
-
-```
-data/cdc_outreach_ab_synthetic.csv
-```
+* **Predictive modeling (XGBoost)** to forecast scheduling behavior and support targeting
 
 ---
 
@@ -84,79 +60,6 @@ This approach:
 
 ---
 
-## 🤖 Predictive Analytics (XGBoost – Planned Extension)
-
-A follow-up notebook will extend the analysis by training an **XGBoost classifier** to predict:
-
-* Probability of scheduling within 7 days (`scheduled_7d`)
-* (Optional) Probability of completion within 30 days (`completed_30d`)
-
-**Use cases:**
-
-* Target high-likelihood responders
-* Identify high-barrier populations
-* Support resource allocation and campaign design
-
-**Planned techniques:**
-
-* Feature encoding
-* Train/validation splits
-* ROC-AUC, precision/recall
-* Feature importance / SHAP explanations
-
----
-
-## 📁 Repository Structure
-
-```
-.
-├── data/
-│   └── cdc_outreach_ab_synthetic.csv
-├── images/
-│   └── outreach_campaign_infographic.png
-├── src/
-│   └── ab_test_data_generator.py
-├── 01_data_generation_and_AB_testing.ipynb
-├── datasci_xgb_skl_env001.yml
-└── README.md
-```
-
-
----
-
-## ▶️ How to Run This Project
-
-### 1️⃣ Create the Conda Environment
-
-```bash
-conda env create -f datasci_xgb_skl_env001.yml
-conda activate datasci_xgb_skl_env001
-```
-
-### 2️⃣ Launch Jupyter
-
-```bash
-jupyter notebook
-```
-
-### 3️⃣ Run the Notebook
-
-Open:
-
-```
-01_data_generation_and_AB_testing.ipynb
-```
-
-This notebook:
-
-* Generates the synthetic dataset
-* Computes observed uplift
-* Runs the permutation-based A/B test
-* Visualizes the null distribution
-* Interprets results in a public health context
-
----
-
 ## 📈 Results: A/B Test (Permutation Test)
 
 ### Key Metrics
@@ -169,55 +72,116 @@ This notebook:
 > Relative lift is computed as:
 > `Lift = (p_B - p_A) / p_A`
 
----
-
 ### Statistical Significance (Permutation Test)
-
-To assess whether the observed uplift could have occurred by chance, a permutation test was performed by repeatedly shuffling treatment labels and recomputing lift under the null hypothesis of no treatment effect.
 
 Because the permuted lifts are centered around **0 (no effect)**, the observed relative lift of **~16.8%** lies far in the right tail of the null distribution, resulting in a **p-value close to 0**.
 
 **Interpretation:**
-This provides strong evidence that the personalized treatment message (Variant B) had a **meaningful positive causal effect** on scheduling rates compared to the standard reminder (Variant A).
-
----
-
-### Null Distribution of Relative Lift (Permutation Test)
+The personalized treatment message (Variant B) had a **meaningful positive causal effect** on scheduling rates compared to the standard reminder (Variant A).
 
 <p align="center">
   <img src="images/permutation_results_histogram.png" alt="Permutation test null distribution of relative lift with observed lift indicator" width="850">
 </p>
 
-**Figure:** Null distribution of relative lift under random assignment (10,000 permutations).
-The dashed line indicates the observed relative lift (+16.76%), which lies far outside the bulk of the null distribution.
+---
+
+## 🧪 Synthetic Dataset Generation (CDC-Style Outreach Simulation)
+
+This project uses a **synthetically generated dataset** produced by a reproducible generator (`src/ab_test_data_generator.py`) that encodes plausible behavioral and operational dynamics observed in real-world healthcare outreach campaigns.
+
+**Design highlights:**
+
+* Realistic demographics and regions
+* Health risk (`risk_score`) and access barriers (`barriers_index`)
+* Prior engagement history
+* Randomized treatment assignment
+* Behavioral funnel: open → click → schedule (7d) → complete (30d)
+* Heterogeneous treatment effects across subgroups
+
+> **Note:** The dataset is synthetic and used strictly for demonstration and portfolio purposes.
 
 ---
 
-## 🔎 Takeaway
+## 🏹 Predictive Analytics (XGBoost – Pre-Send Targeting)
 
-* The treatment message meaningfully increased scheduling behavior
-* The effect is **statistically significant and practically meaningful**
-* This supports deploying the personalized + social proof message strategy at scale
-* Results motivate further analysis using **predictive modeling (XGBoost)** to target high-impact populations
+A **pre-send XGBoost classifier** predicts the probability of scheduling within 7 days (`scheduled_7d`) using only features available **before message delivery** (no opens/clicks), preventing label leakage and reflecting realistic deployment constraints.
 
+**Setup:**
+
+* **Target:** `scheduled_7d`
+* **Features:** demographics, region, channel, timing, risk, barriers, prior engagement, message variant
+* **Preprocessing:** one-hot encoding + numeric passthrough
+* **Imbalance handling:** class weighting + threshold tuning (recall-oriented)
+* **Evaluation:** ROC-AUC (ranking) + recall (coverage)
+* **Interpretability:** SHAP (global, directional, dependence)
+
+### 🔍 Global Feature Importance (Mean |SHAP|)
+
+<p align="center">
+  <img src="images/mean_absval_shap_feature_influence.png" alt="Global SHAP Feature Importance (Mean Absolute SHAP)" width="850">
+</p>
+
+**Interpretation:**
+Access barriers dominate importance, followed by health risk and prior engagement. Message variant and channel matter, but structural access constraints are the primary bottleneck to follow-through.
+
+### ➕➖ Directional Feature Influence (Mean Signed SHAP)
+
+<p align="center">
+  <img src="images/directional_shap_feature_influence.png" alt="Directional SHAP Feature Influence (Mean Signed SHAP)" width="850">
+</p>
+
+**Interpretation:**
+Higher access barriers suppress predicted scheduling, while higher health risk and Message B increase predicted likelihood on average. Mean signed SHAP aggregates heterogeneous effects; dependence plots clarify directionality.
+
+### 📈 SHAP Dependence: Risk Score
+
+<p align="center">
+  <img src="images/shap_vs_riskscore.png" alt="SHAP vs Risk Score Dependence Plot" width="850">
+</p>
+
+**Interpretation:**
+The relationship is **nonlinear**: low-risk individuals are less likely to schedule, while higher-risk individuals increasingly benefit, supporting risk-prioritized outreach.
 
 ---
 
-## ⚙️ Tech Stack
+## 🎯 Uplift Targeting (Operational Use)
 
-* **Language:** Python
-* **Data:** Pandas, NumPy
-* **Visualization:** Plotly
-* **Statistics:** A/B testing
-* **ML (planned):** XGBoost
-* **Reproducibility:** Conda environment YAML
+The model supports **counterfactual targeting**:
+
+* Predict `p_A` and `p_B`
+* Compute **uplift = p_B − p_A**
+* Rank individuals by uplift to allocate Message B under budget constraints
+
+---
+
+## 🎯 Actionable Insights
+
+1. **Pair messaging with barrier reduction** (transport, extended hours)
+2. **Prioritize high-risk populations** for personalized outreach
+3. **Use multi-touch strategies** for poor adherence groups
+4. **Allocate limited resources via uplift ranking**
+
+---
+
+## ▶️ How to Run
+
+```bash
+conda env create -f datasci_xgb_skl_env001.yml
+conda activate datasci_xgb_skl_env001
+jupyter notebook
+```
+
+Run:
+
+* `01_data_generation_and_AB_testing.ipynb`
+* `02_predictive_analytics_xgboost.ipynb`
 
 ---
 
 ## ⚠️ Disclaimer
 
 This project is for **portfolio and educational purposes only**.
-The dataset is **synthetic** and does **not** represent real CDC data or real individuals.
+The dataset used in this project is **synthetic** and does **not** represent real CDC data or real individuals.
 
 ---
 
@@ -230,12 +194,9 @@ Senior Data Scientist / Machine Learning Engineer
 
 ## 📌 Portfolio Relevance
 
-This project highlights:
-
-* A/B testing with causal reasoning
-* Permutation-based statistical inference
-* Visualization of experimental results
-* Healthcare/public health analytics framing
-* Foundations for ML-driven targeting (XGBoost)
-
----
+* Causal experimentation
+* A/B Testing
+* Permutation-based inference
+* SHAP interpretability
+* Uplift targeting
+* Public health analytics framing
