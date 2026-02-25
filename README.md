@@ -70,10 +70,7 @@ Instead of relying on parametric assumptions, this project uses a **permutation 
 
 **Steps:**
 
-1. Compute observed lift:
-   [
-   \text{Lift} = \frac{p_B - p_A}{p_A}
-   ]
+1. Compute observed lift: `Lift = (p_B - p_A) / p_A`
 2. Shuffle treatment labels thousands of times
 3. Recompute lift for each shuffle
 4. Estimate p-value as the probability of observing a lift as extreme as the real one
@@ -160,12 +157,61 @@ This notebook:
 
 ---
 
-## 📈 Example Outputs
+Nice result—that histogram + effect size tells a really clean story 👌
+Here’s a **ready-to-paste README section** that:
 
-* Null distribution of relative lift
-* Observed uplift indicator
-* Statistical significance via permutation p-value
-* Outreach campaign infographic (Message A vs Message B)
+* Shows your key metrics (control/treatment/lift)
+* Interprets the result clearly
+* Embeds the histogram image from `images/permutation_results_histogram.png`
+* Renders correctly on GitHub (no LaTeX issues)
+
+Put this under a section like **“📈 Results: A/B Test (Permutation Test)”** in your `README.md`.
+
+---
+
+## 📈 Results: A/B Test (Permutation Test)
+
+### Key Metrics
+
+* **Control rate (A):** 26.30% (nA = 10,021)
+* **Treatment rate (B):** 30.71% (nB = 9,979)
+* **Absolute lift:** +4.41 percentage points
+* **Relative lift:** **+16.76%**
+
+> Relative lift is computed as:
+> `Lift = (p_B - p_A) / p_A`
+
+---
+
+### Statistical Significance (Permutation Test)
+
+To assess whether the observed uplift could have occurred by chance, a permutation test was performed by repeatedly shuffling treatment labels and recomputing lift under the null hypothesis of no treatment effect.
+
+Because the permuted lifts are centered around **0 (no effect)**, the observed relative lift of **~16.8%** lies far in the right tail of the null distribution, resulting in a **p-value close to 0**.
+
+**Interpretation:**
+This provides strong evidence that the personalized treatment message (Variant B) had a **meaningful positive causal effect** on scheduling rates compared to the standard reminder (Variant A).
+
+---
+
+### Null Distribution of Relative Lift (Permutation Test)
+
+<p align="center">
+  <img src="images/permutation_results_histogram.png" alt="Permutation test null distribution of relative lift with observed lift indicator" width="850">
+</p>
+
+**Figure:** Null distribution of relative lift under random assignment (10,000 permutations).
+The dashed line indicates the observed relative lift (+16.76%), which lies far outside the bulk of the null distribution.
+
+---
+
+## 🔎 Takeaway
+
+* The treatment message meaningfully increased scheduling behavior
+* The effect is **statistically significant and practically meaningful**
+* This supports deploying the personalized + social proof message strategy at scale
+* Results motivate further analysis using **predictive modeling (XGBoost)** to target high-impact populations
+
 
 ---
 
