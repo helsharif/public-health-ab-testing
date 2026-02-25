@@ -1,0 +1,19 @@
+name: datasci_xgb_skl_env001
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  - numpy
+  - pandas
+  - scikit-learn
+  - catboost
+  - ipywidgets
+  - jupyterlab
+  - matplotlib
+  - nbconvert
+  - pathvalidate
+  - plotly
+  - scipy
+  - seaborn
+  - xgboost
+  - streamlit
